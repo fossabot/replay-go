@@ -29,12 +29,19 @@ import (
 	"sort"
 	"time"
 
+	"github.com/version-go/ldflags"
+
 	"github.com/gh-replay/replay-go/cli/command"
 )
 
 const (
-	UsageCommonFmt       = "There is a list of commands available: %v\n"
+	UsageHeaderFmt  = "This is GitHub Replay CLI\n"
+	UsageCommonFmt  = "\tAvailable commands: %v\n"
+	VersionInfoFmt  = "Version: %s\nHash: %s\nBuilt at: %s\n"
+	UsageVersionFmt = "\tver.%s[%s, %s]\n\tAlex <alex@webz.asia>\n\tCopyright (c) 2020 Alex <alex@webz.asia>\n"
+
 	CommandReplayCommits = "replay-commits"
+	CommandVersion       = "version"
 )
 
 type Args struct {
@@ -52,6 +59,7 @@ func New() *Args {
 	}
 
 	args.newReplayCommitsCmd()
+	args.newVersionCmd()
 
 	args.cmdList = []string{}
 	for k := range args.cmds {
@@ -67,11 +75,27 @@ func New() *Args {
 
 // Usage prints all flag sets usages
 func (a *Args) Usage() {
+	fmt.Fprintf(flag.CommandLine.Output(), UsageHeaderFmt)
+	fmt.Fprintf(flag.CommandLine.Output(), UsageVersionFmt, ldflags.Version(), ldflags.Build(), ldflags.Time())
 	flag.Usage()
 	a.UsageCommon()
 	for _, k := range a.cmdList {
-		a.cmds[k].Usage()
+		if a.hasFlags(k) {
+			a.cmds[k].Usage()
+		}
 	}
+}
+
+func (a *Args) allFlags(fsName string) (all []string) {
+	a.cmds[fsName].VisitAll(func(f *flag.Flag) {
+		all = append(all, f.Name)
+	})
+
+	return
+}
+
+func (a *Args) hasFlags(fsName string) bool {
+	return len(a.allFlags(fsName)) > 0
 }
 
 func (a *Args) newReplayCommitsCmd() {
@@ -80,6 +104,10 @@ func (a *Args) newReplayCommitsCmd() {
 		InitStartDateString: a.cmds[CommandReplayCommits].String("new-init-date", time.Now().String(), "new initial commit starting date"),
 		NewAuthor:           a.cmds[CommandReplayCommits].String("author", "", "new author name"),
 	}
+}
+
+func (a *Args) newVersionCmd() {
+	a.cmds[CommandVersion] = flag.NewFlagSet(CommandVersion, flag.ExitOnError)
 }
 
 // Cli parses the commandline args and returns appropriate structure and/or error
@@ -97,6 +125,9 @@ func Cli() (args *Args, err error) {
 	case CommandReplayCommits:
 		args.cmds[CommandReplayCommits].Parse(os.Args[2:])
 		err = args.ReplayCommits.Parse()
+
+	case CommandVersion:
+		fmt.Printf(VersionInfoFmt, ldflags.Version(), ldflags.Build(), ldflags.Time())
 
 	default:
 		err = errors.New("expected a command")
