@@ -21,7 +21,9 @@
 
 package version
 
-import "github.com/version-go/ldflags"
+import (
+	"github.com/version-go/ldflags"
+)
 
 func init() {
 	ldflags.New()
