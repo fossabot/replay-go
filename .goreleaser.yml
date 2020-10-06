@@ -1,0 +1,76 @@
+project_name: gh-replay
+release:
+  github:
+    owner: gh-replay
+    name: replay-go
+builds:
+  - binary: gh-replay
+    goos:
+      - windows
+      - darwin
+      - linux
+    goarch:
+      - "386"
+      - "amd64"
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - "-s -w -X 'github.com/version-go/ldflags.buildVersion={{ .Version }}'"
+      - "-X 'github.com/version-go/ldflags.buildHash={{ .ShortCommit }}'"
+      - "-X 'github.com/version-go/ldflags.buildTime={{ .Date }}'"
+archives:
+  -
+    format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    files:
+      - licence*
+      - LICENCE*
+      - license*
+      - LICENSE*
+      - readme*
+      - README*
+      - changelog*
+      - CHANGELOG*
+snapshot:
+  name_template: SNAPSHOT-{{ .Commit }}
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+uploads:
+  - name: bintray
+    target: https://api.bintray.com/content/gh-replay/replay-go/{{ .ProjectName }}/{{ .Version }}/
+    username: mailoman
+dockers:
+  - goos: linux
+    goarch: "386"
+    binaries:
+      - gh-replay
+    dockerfile: Dockerfile
+    image_templates:
+      - "ghreplay/replay-go:{{ .Tag }}"
+      - "ghreplay/replay-go:v{{ .Major }}"
+      - "ghreplay/replay-go:v{{ .Major }}.{{ .Minor }}"
+      - "ghreplay/replay-go:latest"
+nfpms:
+  -
+    vendor: gh-replay
+    homepage: https://github.com/gh-replay/replay-go
+    maintainer: Alex <alex@webz.asia>
+    description: Replay all GitHub repo commits with some conditions.
+    license: Apache-2.0
+    formats:
+      - deb
+      - rpm
+brews:
+  -
+    tap:
+      owner: gh-replay
+      name: homebrew-gh-replay
+    homepage: https://github.com/gh-replay/replay-go
+    description: Replay all GitHub repo commits with some conditions.
+scoop:
+  bucket:
+    owner: gh-replay
+    name: scoops
+  homepage: https://github.com/gh-replay/replay-go
+  description: Replay all GitHub repo commits with some conditions.
+  license: Apache-2.0
