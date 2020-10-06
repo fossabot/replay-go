@@ -28,5 +28,5 @@ jobs:
         version: latest
         args: release --rm-dist
         workdir: ./cmd/replay
-#      env:
-#        GITHUB_TOKEN: ${{ secrets.GO_RELEASER_GITHUB_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GO_RELEASER_GITHUB_TOKEN }}
