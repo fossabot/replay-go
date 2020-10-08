@@ -46,7 +46,7 @@ jobs:
         flags: unittests # optional
         fail_ci_if_error: false # optional (default = false)
 
-    - name: Test Coverage - Code Climate
-      run: ./test-reporter after-build
-      env:
-        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+#    - name: Test Coverage - Code Climate
+#      run: ./test-reporter after-build
+#      env:
+#        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
