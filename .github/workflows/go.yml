@@ -29,6 +29,12 @@ jobs:
     - name: Build
       run: go build -v ./cmd/replay/replay.go
 
+    - name: Before Build - Code Climate
+      run: |
+        curl -s -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./test-reporter
+        chmod +x ./test-reporter
+        ./test-reporter before-build
+
     - name: Test
       run: go test -race -coverprofile=coverage.txt -covermode=atomic $(go list ./... | grep -v /vendor/)
 
@@ -41,9 +47,6 @@ jobs:
         fail_ci_if_error: false # optional (default = false)
 
     - name: Test Coverage - Code Climate
-      run: |
-        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./test-reporter
-        chmod +x ./test-reporter
-        ./test-reporter after-build
+      run: ./test-reporter after-build
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
